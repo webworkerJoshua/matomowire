@@ -10,7 +10,6 @@ class MatomoWireConfig extends ModuleConfig
             'render_position' => 'body',
             'site_id' => '',
             'container_id' => '',
-            'track_users_without_js' => false,
             'set_do_not_track' => false,
             'disable_cookies' => false,
             'integrate_privacywire' => false,
@@ -74,20 +73,12 @@ class MatomoWireConfig extends ModuleConfig
         $f->showIf("embedding_method=tag");
         $inputfields->add($f);
 
-        // Site Tracking: Track Users Without JavaScript
-        $f = $this->modules->get('InputfieldCheckbox');
-        $f->attr('name', 'track_users_without_js');
-        $f->showIf("embedding_method=site");
-        $f->label = $this->_('Track users without JavaScript');
-        $f->columnWidth = 33;
-        $inputfields->add($f);
-
         // Site Tracking: Respect DoNotTrack (DNT)
         $f = $this->modules->get('InputfieldCheckbox');
         $f->attr('name', 'set_do_not_track');
         $f->showIf("embedding_method=site");
         $f->label = $this->_('Respect Do-Not-Track');
-        $f->columnWidth = 33;
+        $f->columnWidth = 50;
         $inputfields->add($f);
 
         // Site Tracking: Disable Cookies
@@ -95,7 +86,7 @@ class MatomoWireConfig extends ModuleConfig
         $f->attr('name', 'disable_cookies');
         $f->showIf("embedding_method=site");
         $f->label = $this->_('Disable Cookies');
-        $f->columnWidth = 34;
+        $f->columnWidth = 50;
         $inputfields->add($f);
 
         // Fieldset for PrivacyWire Integration
