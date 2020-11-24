@@ -46,12 +46,15 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
         $this->addHookAfter('Page::render', $this, 'render');
     }
 
-    private function getScriptWrapper() {
-        // TODO
-        // Checks if header, then async
-        // ($this->render_position === "head")
+    private function getScriptTag()
+    {
+        $async = ($this->render_position == 'head') ? 'async' : '';
 
-        // checks for privacywire, then different stuff
+        if ($this->integrate_privacywire == true) {
+            return '<script type="text/plain" data-type="text/javascript" data-category="' . $this->privacywire_cookie_category . '" ' . $async . '>';
+        }
+
+        return '<script type="text/javascript" ' . $async . '>';
     }
 
     private function getScriptContents()
@@ -67,8 +70,8 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
 
     private function getSiteScriptContents()
     {
-        $set_do_not_track = ($this->set_do_not_track === true) ? '_paq.push(["setDoNotTrack", true]);' : '';
-        $disable_cookies = ($this->disable_cookies === true) ? '_paq.push(["disableCookies"]);' : '';
+        $set_do_not_track = ($this->set_do_not_track == true) ? '_paq.push(["setDoNotTrack", true]);' : '';
+        $disable_cookies = ($this->disable_cookies == true) ? '_paq.push(["disableCookies"]);' : '';
         $matomo_url = rtrim($this->wire('sanitizer')->url($this->matomo_url), '/') . '/';
         $site_id = $this->wire('sanitizer')->int($this->site_id);
 
@@ -78,14 +81,9 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
 
     public function ___render(HookEvent $event)
     {
+        $replaceTag = ($this->render_position == "head") ? "</head>" : "</body>";
 
-        $replaceTag = ($this->render_position === "head") ? "</head>" : "</body>";
-
-        $content = $this->getScriptContents();
-
-        // TODO: load script wrapper, depending on render position and PrivacyWire Integration
-
-        $event->return = str_replace($replaceTag, "<script>{$content}</script>{$replaceTag}", $event->return);
+        $event->return = str_replace($replaceTag, "{$this->getScriptTag()}{$this->getScriptContents()}</script>{$replaceTag}", $event->return);
     }
 
 
