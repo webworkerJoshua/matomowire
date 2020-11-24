@@ -1,0 +1,46 @@
+<?php namespace ProcessWire;
+
+/**
+ * Textformatter MatomoWire
+ * This module adds the textformatter for MatomoWire Opt-Out iFrame
+ *
+ *
+ * @author blaueQuelle
+ *
+ * ProcessWire 3.x
+ * Copyright (C) 2011 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+class TextformatterMatomoWire extends Textformatter implements Module
+{
+
+    public static function getModuleInfo()
+    {
+        return [
+            'title' => 'MatomoWire Textformatter',
+            'summary' => "MatomoWire Textformatter to render matomo opt-out iframe via shortcode [[matomowire-opt-out]]",
+            'author' => 'blaueQuelle',
+            'href' => "https://github.com/blaueQuelle/matomowire",
+            'version' => 1,
+            'requires' => [
+                "PHP>=7.2",
+                "ProcessWire>=3.0.110"
+            ],
+        ];
+    }
+
+    public function formatValue(Page $page, Field $field, &$str)
+    {
+        $matomoWire = $this->modules->get("MatomoWire"); // TODO Stuff
+
+        $tag_search = $this->open_tag . $this->tag_name . $this->close_tag;
+
+        $tag_replace = "<strong>TODO: Add Matomo Opt-Out iFrame OR PrivacyWire Cookie Opt-Out</strong>"; // TODO: Add Matomo Opt-Out iFrame OR PrivacyWire Cookie Opt-Out
+
+        $str = str_replace($tag_search, $tag_replace, $str);
+    }
+}

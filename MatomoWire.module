@@ -1,0 +1,100 @@
+<?php namespace ProcessWire;
+
+/**
+ * MatomoWire
+ * This module adds embedding methods for Matomo (aka Piwik)
+ *
+ * @author blaueQuelle
+ *
+ * ProcessWire 3.x
+ * Copyright (C) 2011 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+class MatomoWire extends WireData implements Module, ConfigurableModule
+{
+
+    public static function getModuleInfo()
+    {
+        return [
+            'title' => "MatomoWire",
+            'summary' => "This module adds embedding methods for Matomo (aka Piwik)",
+            'author' => "blaueQuelle",
+            'href' => "https://github.com/blaueQuelle/matomowire",
+            'version' => 1,
+            'autoload' => true,
+            'singular' => true,
+            'requires' => ["PHP>=7.2", "ProcessWire>=3.0.110"],
+            'installs' => ["TextformatterMatomoWire"],
+            'icon' => 'flask'
+        ];
+    }
+
+    public function ready()
+    {
+        if (
+            $this->wire('page')->template == 'admin' || // exclude admin pages
+            $this->wire('page')->template == 'form-builder' || // exclude from form-builder iframe
+            empty($this->matomo_url) // do nothing, when there is no matomo URL
+        ) {
+            return;
+        }
+
+        $this->addHookAfter('Page::render', $this, 'render');
+    }
+
+    private function getScriptWrapper() {
+        // TODO
+        // Checks if header, then async
+        // ($this->render_position === "head")
+
+        // checks for privacywire, then different stuff
+    }
+
+    private function getScriptContents()
+    {
+        return ($this->embedding_method == "tag") ? $this->getTagManagerScriptContents() : $this->getSiteScriptContents();
+    }
+
+    private function getTagManagerScriptContents()
+    {
+        $matomo_url = rtrim($this->wire('sanitizer')->url($this->matomo_url), '/') . '/';
+        return 'var _mtm=window._mtm=window._mtm||[];_mtm.push({"mtm.startTime":(new Date().getTime()),"event":"mtm.Start"});var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.type="text/javascript";g.async=true;g.src="' . $matomo_url . 'js/container_' . $this->container_id . '.js";s.parentNode.insertBefore(g,s);';
+    }
+
+    private function getSiteScriptContents()
+    {
+        $set_do_not_track = ($this->set_do_not_track === true) ? '_paq.push(["setDoNotTrack", true]);' : '';
+        $disable_cookies = ($this->disable_cookies === true) ? '_paq.push(["disableCookies"]);' : '';
+        $matomo_url = rtrim($this->wire('sanitizer')->url($this->matomo_url), '/') . '/';
+        $site_id = $this->wire('sanitizer')->int($this->site_id);
+
+        return 'var _paq=window._paq=window._paq||[];' . $set_do_not_track . $disable_cookies . '_paq.push(["trackPageView"]);_paq.push(["enableLinkTracking"]);(function(){var u="' . $matomo_url . '";_paq.push(["setTrackerUrl", u+"matomo.php"]);_paq.push(["setSiteId", "' . $site_id . '"]);var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.type="text/javascript";g.async=true;g.src=u+"matomo.js";s.parentNode.insertBefore(g,s);})();';
+    }
+
+
+    public function ___render(HookEvent $event)
+    {
+
+        $replaceTag = ($this->render_position === "head") ? "</head>" : "</body>";
+
+        $content = $this->getScriptContents();
+
+        // TODO: load script wrapper, depending on render position and PrivacyWire Integration
+
+        $event->return = str_replace($replaceTag, "<script>{$content}</script>{$replaceTag}", $event->return);
+    }
+
+
+    public function ___install()
+    {
+    }
+
+    public function ___uninstall()
+    {
+    }
+
+}
