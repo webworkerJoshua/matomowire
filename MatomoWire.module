@@ -24,7 +24,7 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
             'summary' => "This module adds embedding methods for Matomo (aka Piwik)",
             'author' => "blaueQuelle",
             'href' => "https://github.com/blaueQuelle/matomowire",
-            'version' => 1,
+            'version' => 2,
             'autoload' => true,
             'singular' => true,
             'requires' => ["PHP>=7.2", "ProcessWire>=3.0.110"],

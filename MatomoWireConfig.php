@@ -84,6 +84,7 @@ class MatomoWireConfig extends ModuleConfig
         // Site Tracking: Disable Cookies
         $f = $this->modules->get('InputfieldCheckbox');
         $f->attr('name', 'disable_cookies');
+        $f->description = $this->_('It is possible to track users [without cookies](https://matomo.org/faq/new-to-piwik/how-do-i-use-matomo-analytics-without-consent-or-cookie-banner/) - [the data accuracy is impacted](https://matomo.org/faq/general/faq_156/)');
         $f->showIf("embedding_method=site");
         $f->label = $this->_('Disable Cookies');
         $f->columnWidth = 50;
