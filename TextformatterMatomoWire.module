@@ -46,7 +46,7 @@ class TextformatterMatomoWire extends Textformatter implements Module
             $content = "<button class='button privacywire-show-options'>{$privacyWire->get("textformatter_choose_label$lang|textformatter_choose_label")}</button>";
         } else {
             $matomo_url = rtrim($this->wire('sanitizer')->url($matomoWire->matomo_url), '/') . '/';
-            $content = "<iframe loading='lazy' style='border: 0; height: 200px; width: 600px;' src='" . $matomo_url . "index.php?module=CoreAdminHome&action=optOut&language=de&fontFamily=sans-serif'></iframe>"; // TODO: Adjust iFrame Params
+            $content = "<div class='matomowire-iframe'><iframe loading='lazy' style='border: 0; height: 200px; width: 600px;' src='" . $matomo_url . "index.php?module=CoreAdminHome&action=optOut&language=de&fontFamily=sans-serif'></iframe></div>"; // TODO: Adjust iFrame Params
         }
 
         $tag_search = $this->open_tag . $this->tag_name . $this->close_tag;
