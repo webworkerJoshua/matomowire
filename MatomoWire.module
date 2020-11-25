@@ -50,7 +50,7 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
     {
         $async = ($this->render_position == 'head') ? 'async' : '';
 
-        if ($this->integrate_privacywire == true) {
+        if ($this->integrate_privacywire == true && $this->wire('modules')->isInstalled('PrivacyWire') && $this->wire('modules')->get('PrivacyWire')) {
             return '<script type="text/plain" data-type="text/javascript" data-category="' . $this->privacywire_cookie_category . '" ' . $async . '>';
         }
 
