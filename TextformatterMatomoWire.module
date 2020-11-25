@@ -35,11 +35,26 @@ class TextformatterMatomoWire extends Textformatter implements Module
 
     public function formatValue(Page $page, Field $field, &$str)
     {
-        $matomoWire = $this->modules->get("MatomoWire"); // TODO Stuff
+        $matomoWire = $this->modules->get("MatomoWire");
+
+        if ($matomoWire->integrate_privacywire == true && $matomoWire->opt_out_type == "privacywire" && $this->wire('modules')->isInstalled('PrivacyWire') && $this->wire('modules')->get('PrivacyWire')) {
+            $privacyWire = $this->modules->get("PrivacyWire");
+
+            // Multi Language Support
+            if ($this->wire('languages')) {
+                $userLanguage = $this->wire('user')->language;
+                $lang = $userLanguage->isDefault() ? '' : "__$userLanguage->id";
+            } else {
+                $lang = '';
+            }
+            $content = "<button class='button privacywire-show-options'>{$privacyWire->get("textformatter_choose_label$lang|textformatter_choose_label")}</button>";
+        } else {
+            $matomo_url = rtrim($this->wire('sanitizer')->url($matomoWire->matomo_url), '/') . '/';
+            $content = "<iframe loading='lazy' style='border: 0; height: 200px; width: 600px;' src='" . $matomo_url . "index.php?module=CoreAdminHome&action=optOut&language=de&fontFamily=sans-serif'></iframe>"; // TODO: Adjust iFrame Params
+        }
 
         $tag_search = $this->open_tag . $this->tag_name . $this->close_tag;
-
-        $tag_replace = "<strong>TODO: Add Matomo Opt-Out iFrame OR PrivacyWire Cookie Opt-Out</strong>"; // TODO: Add Matomo Opt-Out iFrame OR PrivacyWire Cookie Opt-Out
+        $tag_replace = $content;
 
         $str = str_replace($tag_search, $tag_replace, $str);
     }
