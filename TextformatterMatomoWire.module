@@ -41,12 +41,8 @@ class TextformatterMatomoWire extends Textformatter implements Module
             $privacyWire = $this->modules->get("PrivacyWire");
 
             // Multi Language Support
-            if ($this->wire('languages')) {
-                $userLanguage = $this->wire('user')->language;
-                $lang = $userLanguage->isDefault() ? '' : "__$userLanguage->id";
-            } else {
-                $lang = '';
-            }
+            $lang = ($this->wire('languages') && !$this->wire('user')->language->isDefault()) ? '__' . $this->wire('user')->language->id : '';
+
             $content = "<button class='button privacywire-show-options'>{$privacyWire->get("textformatter_choose_label$lang|textformatter_choose_label")}</button>";
         } else {
             $matomo_url = rtrim($this->wire('sanitizer')->url($matomoWire->matomo_url), '/') . '/';
