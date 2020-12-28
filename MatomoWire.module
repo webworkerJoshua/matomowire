@@ -24,7 +24,7 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
             'summary' => "This module adds embedding methods for Matomo (aka Piwik)",
             'author' => "blaueQuelle",
             'href' => "https://github.com/blaueQuelle/matomowire",
-            'version' => 3,
+            'version' => 4,
             'autoload' => true,
             'singular' => true,
             'requires' => ["PHP>=7.2", "ProcessWire>=3.0.110"],
@@ -38,7 +38,8 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
         if (
             $this->wire('page')->template == 'admin' || // exclude admin pages
             $this->wire('page')->template == 'form-builder' || // exclude from form-builder iframe
-            empty($this->matomo_url) // do nothing, when there is no matomo URL
+            empty($this->matomo_url) || // do nothing, when there is no matomo URL
+            (empty($this->container_id) && empty($this->site_id)) // do nothing, if both the container and site id is empty
         ) {
             return;
         }
