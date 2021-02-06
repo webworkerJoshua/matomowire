@@ -91,16 +91,21 @@ class MatomoWireConfig extends ModuleConfig
         $inputfields->add($f);
 
         // Fieldset for PrivacyWire Integration
+        $privacywireIsInstalled = $this->modules->isInstalled('PrivacyWire');
         $privacywire_integration = $this->modules->get('InputfieldFieldset');
-        $privacywire_integration->label = $this->_("PrivacyWire Integration");
+        $privacywire_integration->label = $this->_('PrivacyWire Integration');
+        if(!$privacywireIsInstalled) {
+            $privacywire_integration->collapsed = Inputfield::collapsedNoLocked;  // Inputfield::collapsedLocked
+            $privacywire_integration->description = $this->_('**Important:** PrivacyWire needs to be installed to enable this feature!') . ' (https://github.com/blaueQuelle/privacywire)';
+        }
         $inputfields->add($privacywire_integration);
 
         // Enable PrivacyWire Integration
         $f = $this->modules->get('InputfieldCheckbox');
         $f->attr('name', 'integrate_privacywire');
         $f->label = $this->_('Enable PrivacyWire Integration');
-        $f->description = $this->_('**Important:** PrivacyWire needs to be installed to enable this feature!');
         $f->columnWidth = 33;
+        if(!$privacywireIsInstalled) $f->collapsed = Inputfield::collapsedLocked;
         $privacywire_integration->add($f);
 
         // PrivacyWire Cookie Category
@@ -118,6 +123,7 @@ class MatomoWireConfig extends ModuleConfig
             'external_media' => $this->_("External Media")
         ];
         $f->columnWidth = 33;
+        if(!$privacywireIsInstalled) $f->collapsed = Inputfield::collapsedLocked;
         $privacywire_integration->add($f);
 
         // PrivacyWire Cookie Category
@@ -131,6 +137,7 @@ class MatomoWireConfig extends ModuleConfig
             "privacywire" => $this->_("PrivacyWire Choose-Cookies-Window"),
         ];
         $f->columnWidth = 34;
+        if(!$privacywireIsInstalled) $f->collapsed = Inputfield::collapsedLocked;
         $privacywire_integration->add($f);
 
         return $inputfields;
