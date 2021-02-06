@@ -29,7 +29,6 @@ class MatomoWireConfig extends ModuleConfig
         $f->label = $this->_('Matomo URL');
         $f->description = $this->_('Insert the full URL including http:// or https://');
         $f->columnWidth = 33;
-        $f->required = 1;
         $inputfields->add($f);
 
         // Embedding Method
@@ -96,7 +95,7 @@ class MatomoWireConfig extends ModuleConfig
         $privacywire_integration->label = $this->_('PrivacyWire Integration');
         if(!$privacywireIsInstalled) {
             $privacywire_integration->collapsed = Inputfield::collapsedNoLocked;  // Inputfield::collapsedLocked
-            $privacywire_integration->description = $this->_('**Important:** PrivacyWire needs to be installed to enable this feature!') . ' (https://github.com/blaueQuelle/privacywire)';
+            $privacywire_integration->description = $this->_('**Important:** PrivacyWire needs to be installed to enable this feature!') . ' ([https://github.com/blaueQuelle/privacywire](https://github.com/blaueQuelle/privacywire))';
         }
         $inputfields->add($privacywire_integration);
 
