@@ -24,7 +24,7 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
             'summary' => "This module adds embedding methods for Matomo (aka Piwik)",
             'author' => "blaueQuelle",
             'href' => "https://github.com/blaueQuelle/matomowire",
-            'version' => 4,
+            'version' => 5,
             'autoload' => true,
             'singular' => true,
             'requires' => ["PHP>=7.2", "ProcessWire>=3.0.110"],
@@ -47,7 +47,19 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
         $this->addHookAfter('Page::render', $this, 'render');
     }
 
-    public function ___getScriptTag()
+    public function ___render(HookEvent $event)
+    {
+        $replaceTag = ($this->render_position == "head") ? "</head>" : "</body>";
+
+        $scriptContent = $this->getScriptContent();
+        if (empty($scriptContent)) {
+            return;
+        }
+
+        $event->return = str_replace($replaceTag, $this->getScriptOpeningTag() . $scriptContent . "</script>" . $replaceTag, $event->return);
+    }
+
+    public function ___getScriptOpeningTag(): string
     {
         $async = ($this->render_position == 'head') ? 'async' : '';
 
@@ -58,33 +70,33 @@ class MatomoWire extends WireData implements Module, ConfigurableModule
         return '<script type="text/javascript" ' . $async . '>';
     }
 
-    public function ___getScriptContents()
+    public function ___getScriptContent(): string
     {
-        return ($this->embedding_method == "tag") ? $this->getTagManagerScriptContents() : $this->getSiteScriptContents();
+        return ($this->embedding_method == "tag") ? $this->getTagManagerScriptContent() : $this->getSiteScriptContent();
     }
 
-    public function ___getTagManagerScriptContents()
+    public function ___getTagManagerScriptContent(): string
     {
+        if (empty($this->container_id)) {
+            return '';
+        }
+
         $matomo_url = rtrim($this->wire('sanitizer')->url($this->matomo_url), '/') . '/';
         return 'var _mtm=window._mtm=window._mtm||[];_mtm.push({"mtm.startTime":(new Date().getTime()),"event":"mtm.Start"});var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.type="text/javascript";g.async=true;g.src="' . $matomo_url . 'js/container_' . $this->container_id . '.js";s.parentNode.insertBefore(g,s);';
     }
 
-    public function ___getSiteScriptContents()
+    public function ___getSiteScriptContent(): string
     {
+        if (empty($this->site_id)) {
+            return '';
+        }
+
         $set_do_not_track = ($this->set_do_not_track == true) ? '_paq.push(["setDoNotTrack", true]);' : '';
         $disable_cookies = ($this->disable_cookies == true) ? '_paq.push(["disableCookies"]);' : '';
         $matomo_url = rtrim($this->wire('sanitizer')->url($this->matomo_url), '/') . '/';
         $site_id = $this->wire('sanitizer')->int($this->site_id);
 
         return 'var _paq=window._paq=window._paq||[];' . $set_do_not_track . $disable_cookies . '_paq.push(["trackPageView"]);_paq.push(["enableLinkTracking"]);(function(){var u="' . $matomo_url . '";_paq.push(["setTrackerUrl", u+"matomo.php"]);_paq.push(["setSiteId", "' . $site_id . '"]);var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.type="text/javascript";g.async=true;g.src=u+"matomo.js";s.parentNode.insertBefore(g,s);})();';
-    }
-
-
-    public function ___render(HookEvent $event)
-    {
-        $replaceTag = ($this->render_position == "head") ? "</head>" : "</body>";
-
-        $event->return = str_replace($replaceTag, "{$this->getScriptTag()}{$this->getScriptContents()}</script>{$replaceTag}", $event->return);
     }
 
 
